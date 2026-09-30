@@ -12,7 +12,7 @@ In più arrivano:
 - l'integrazione con Home Assistant e, tramite Home Assistant, con Google Home, Apple Home e Alexa.
 
 La scheda ha **esattamente la forma della scheda originale** e si avvita al suo posto, senza forare né modificare il guscio.
-
+<img width="1600" height="1535" alt="mappa-morsetti" src="https://github.com/user-attachments/assets/cfe0977b-5b8b-4832-93a6-63c6a8a9f1a7" />
 > **Compatibilità:** telefoni **Siemens / Italtel S62** (versione da parete) e impianti citofonici **URMET 4+N** analogici.
 > Altri telefoni e impianti: vedi [Compatibilità](docs/compatibilita.md).
 
