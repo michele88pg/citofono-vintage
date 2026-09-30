@@ -1,0 +1,21 @@
+# ESPHome
+secrets.yaml
+.esphome/
+
+# KiCad: backup, cache e impostazioni locali
+*-backups/
+_autosave-*
+*.kicad_prl
+*.lck
+fp-info-cache
+*.bak
+*.kicad_pcb-bak
+*.kicad_sch-bak
+~*.lck
+\#auto_saved_files\#
+
+# Sistema operativo ed editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

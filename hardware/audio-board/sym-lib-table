@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "CitofonoAudio")(type "KiCad")(uri "${KIPRJMOD}/CitofonoAudio.kicad_sym")(options "")(descr "ES8311 + SM-LP-5001"))
+)

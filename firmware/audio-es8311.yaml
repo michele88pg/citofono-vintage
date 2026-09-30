@@ -1,0 +1,135 @@
+# =============================================================================
+#  Pacchetto ESPHome per la SCHEDA AUDIO ES8311 (daughterboard su J8/J9/J10)
+#
+#  Si aggiunge al firmware principale, in citofono-vintage.yaml:
+#
+#    packages:
+#      audio: !include audio-es8311.yaml
+#
+#  Mappa (J8 della scheda madre):
+#    IO16 MCLK   IO9 BCLK   IO10 LRCLK   IO11 DOUT (ESP -> codec)   IO12 DIN (codec -> ESP)
+#    IO13 SDA    IO14 SCL   -> ES8311 @0x18, TCA9554 @0x20
+#  TCA9554: P0 = relè audio K1 (linea al codec), P1 = LED "audio remoto" (acceso basso)
+#
+#  Questo pacchetto rende disponibili microfono (= voce dal posto esterno) e
+#  altoparlante (= voce verso il posto esterno). Il componente che li collega
+#  al telefono (SIP/WebRTC, es. esphome-intercom) si aggiunge sopra a questi id:
+#    microphone: citofono_mic     speaker: citofono_spk     audio_dac: codec
+# =============================================================================
+
+i2c:
+  id: bus_audio
+  sda: GPIO13
+  scl: GPIO14
+  frequency: 400kHz
+
+i2s_audio:
+  - id: i2s_bus
+    i2s_lrclk_pin: GPIO10
+    i2s_bclk_pin: GPIO9
+    i2s_mclk_pin: GPIO16
+
+audio_dac:
+  - platform: es8311
+    id: codec
+    i2c_id: bus_audio
+    address: 0x18
+    use_mclk: true
+    use_microphone: true
+    # Il segnale arriva attenuato di ~17 dB dalla presa ad alta impedenza:
+    # si parte da 24 dB e si regola al collaudo (0DB ... 42DB)
+    mic_gain: 24DB
+    sample_rate: 16000
+    bits_per_sample: 16bit
+
+microphone:
+  - platform: i2s_audio
+    id: citofono_mic
+    i2s_audio_id: i2s_bus
+    i2s_din_pin: GPIO12
+    adc_type: external
+    pdm: false
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: left
+
+speaker:
+  - platform: i2s_audio
+    id: citofono_spk
+    i2s_audio_id: i2s_bus
+    i2s_dout_pin: GPIO11
+    dac_type: external
+    audio_dac: codec
+    sample_rate: 16000
+    bits_per_sample: 16bit
+    channel: mono
+
+pca9554:
+  - id: espansore_audio
+    i2c_id: bus_audio
+    address: 0x20
+
+switch:
+  # Relè K1 della scheda audio: ON = linea collegata al codec (cornetta esclusa)
+  - platform: gpio
+    id: relay_audio
+    name: "Relè audio (scheda ES8311)"
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pca9554: espansore_audio
+      number: 0
+      mode:
+        output: true
+
+  - platform: gpio
+    id: led_audio
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pca9554: espansore_audio
+      number: 1
+      inverted: true
+      mode:
+        output: true
+
+  # Comando unico per Home Assistant: "rispondo da remoto"
+  - platform: template
+    id: remote_audio
+    name: "Rispondi da remoto (audio)"
+    icon: mdi:phone-in-talk
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    turn_on_action:
+      - switch.turn_on: relay_hook      # K2 scheda madre: impegna la linea URMET
+      - delay: 200ms
+      - switch.turn_on: relay_audio     # K1 scheda audio: linea -> codec
+      - switch.turn_on: led_audio
+      - script.execute: remote_audio_timeout
+    turn_off_action:
+      - script.stop: remote_audio_timeout
+      - switch.turn_off: relay_audio
+      - switch.turn_off: led_audio
+      - switch.turn_off: relay_hook
+
+script:
+  # Sicurezza: la conversazione remota si chiude da sola dopo 2 minuti
+  - id: remote_audio_timeout
+    mode: restart
+    then:
+      - delay: 120s
+      - switch.turn_off: remote_audio
+
+number:
+  - platform: template
+    id: volume_uscita
+    name: "Volume voce verso la strada"
+    icon: mdi:volume-high
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 60
+    restore_value: true
+    optimistic: true
+    on_value:
+      - lambda: id(codec).set_volume(x / 100.0f);

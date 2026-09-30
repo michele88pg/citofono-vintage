@@ -1,0 +1,485 @@
+# =============================================================================
+#  Citofono Vintage — firmware ESPHome per la scheda rev 0.5 (Siemens S62 / URMET 4+N)
+#
+#  Mappa GPIO (da schematic rev 0.3+):
+#    IO4  DIAL_PULSE   disco 1-2, contatto impulsi cid (chiuso a riposo -> LOW, ogni impulso -> HIGH)
+#    IO18 DIAL_ACTIVE  disco 3-4, contatto cld (chiuso durante la rotazione -> LOW)
+#    IO5  HOOK_SENSE   cornetta: contatto gancio HS1-HS2 su J4 pin 1-2
+#    IO6  CALL_SENSE   optoisolatore OK1: LOW quando arriva la chiamata (12 V AC su CA)
+#    IO7  DRIVE_OPEN   K1 -> chiude 9<->6 = APRE IL PORTONE
+#    IO17 DRIVE_HOOK   K2 -> simula il sollevamento della cornetta (abilita la fonia URMET)
+#    IO15 BUZZER       Q1 -> buzzer attivo TMB12A05
+#    IO8  LED_STATUS   LED verde D7
+#    IO19/IO20         USB nativo (programmazione e log)
+#
+#  Primo caricamento: via USB-C con il cavo, poi aggiornamenti via WiFi (OTA).
+# =============================================================================
+
+substitutions:
+  name: citofono-vintage
+  friendly_name: Citofono Vintage
+  # Durata della chiusura del relè apriporta (ms). Modificabile anche da Home Assistant.
+  open_time_default: "1500"
+  # Pausa tra "sgancio simulato" e apertura, nell'apertura remota (ms)
+  hook_settle_ms: "400"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  project:
+    name: "citofono-vintage.s62"
+    version: "0.5.0"
+  on_boot:
+    priority: -100
+    then:
+      # Sicurezza: all'avvio i due relè devono essere sempre aperti
+      - switch.turn_off: relay_open
+      - switch.turn_off: relay_hook
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+# Modulo ESP32-S3-WROOM-1-N16R2: PSRAM quad da 2 MB
+psram:
+  mode: quad
+  speed: 80MHz
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Se il WiFi non è raggiungibile crea una rete "Citofono-Setup" per configurarlo dal telefono
+  ap:
+    ssid: "Citofono-Setup"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+# Pagina web locale (http://citofono-vintage.local): funziona anche senza Home Assistant
+web_server:
+  version: 3
+  port: 80
+  auth:
+    username: admin
+    password: !secret web_password
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Rome
+
+# -----------------------------------------------------------------------------
+#  Stato interno
+# -----------------------------------------------------------------------------
+globals:
+  - id: pulse_count
+    type: int
+    initial_value: "0"
+  - id: dialed_code
+    type: std::string
+    initial_value: '""'
+  - id: remote_hook_used
+    type: bool
+    initial_value: "false"
+  - id: calls
+    type: int
+    restore_value: true
+    initial_value: "0"
+
+# -----------------------------------------------------------------------------
+#  Uscite (relè e buzzer) — interne: si comandano solo tramite gli script qui sotto
+# -----------------------------------------------------------------------------
+switch:
+  - platform: gpio
+    id: relay_open
+    name: "Relè apriporta (K1)"
+    pin: GPIO7
+    restore_mode: ALWAYS_OFF
+    internal: true
+    on_turn_on:
+      # Interblocco: il relè apriporta non resta mai chiuso più di 5 s
+      - delay: 5s
+      - switch.turn_off: relay_open
+
+  - platform: gpio
+    id: relay_hook
+    name: "Sgancio simulato (K2)"
+    pin: GPIO17
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      # Interblocco: la linea non resta impegnata più di 2 minuti
+      - delay: 120s
+      - switch.turn_off: relay_hook
+
+  - platform: gpio
+    id: buzzer
+    pin: GPIO15
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  # Opzioni configurabili (ricordate dopo un riavvio)
+  - platform: template
+    id: dnd
+    name: "Non disturbare"
+    icon: mdi:bell-off
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+
+  - platform: template
+    id: auto_open
+    name: "Apertura automatica alla chiamata"
+    icon: mdi:door-open
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+
+  - platform: template
+    id: remote_uses_hook
+    name: "Apertura remota con sgancio simulato"
+    icon: mdi:phone-hangup
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+
+  - platform: template
+    id: require_handset
+    name: "Rotella apre solo a cornetta alzata"
+    icon: mdi:phone-classic
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+
+output:
+  - platform: gpio
+    id: led_out
+    pin: GPIO8
+
+light:
+  - platform: binary
+    id: status_light
+    name: "LED di stato"
+    output: led_out
+    internal: true
+
+number:
+  - platform: template
+    id: open_time
+    name: "Durata apertura portone"
+    icon: mdi:timer-outline
+    unit_of_measurement: ms
+    min_value: 300
+    max_value: 4000
+    step: 100
+    initial_value: ${open_time_default}
+    optimistic: true
+    restore_value: true
+    entity_category: config
+
+text:
+  # Codice segreto da comporre con la rotella. Vuoto = qualsiasi numero apre (comportamento originale)
+  - platform: template
+    id: secret_code
+    name: "Codice rotella"
+    icon: mdi:dialpad
+    mode: password
+    min_length: 0
+    max_length: 8
+    optimistic: true
+    restore_value: true
+    initial_value: ""
+    entity_category: config
+
+# -----------------------------------------------------------------------------
+#  Ingressi
+# -----------------------------------------------------------------------------
+binary_sensor:
+  # Contatto impulsi del disco: a riposo chiuso (LOW), ogni impulso lo apre (HIGH).
+  # Disco S62: 10 impulsi/s, apertura ~60 ms, chiusura ~40 ms.
+  - platform: gpio
+    id: dial_pulse
+    internal: true
+    pin:
+      number: GPIO4
+      mode: INPUT
+    filters:
+      - delayed_on: 8ms
+      - delayed_off: 8ms
+    on_press:
+      - lambda: 'id(pulse_count) += 1;'
+      # Se il contatto "cld" non è cablato, la cifra si chiude comunque dopo 300 ms senza impulsi
+      - script.execute: digit_timeout
+
+  # Contatto di fine rotazione: LOW mentre il disco ruota, torna HIGH quando il disco è a riposo
+  - platform: gpio
+    id: dial_active
+    name: "Disco in rotazione"
+    icon: mdi:rotate-right
+    pin:
+      number: GPIO18
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on_off: 15ms
+    on_release:
+      - script.execute: finalize_digit
+
+  # Cornetta. ATTENZIONE: verificare al primo collaudo la polarità del contatto HS
+  # (se "Cornetta alzata" risulta invertito, togliere/aggiungere "inverted: true").
+  - platform: gpio
+    id: handset
+    name: "Cornetta alzata"
+    icon: mdi:phone-classic
+    pin:
+      number: GPIO5
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on_off: 50ms
+    on_press:
+      - script.stop: ring_pattern
+      - switch.turn_off: buzzer
+    on_release:
+      # Cornetta riagganciata: si azzera il codice composto
+      - lambda: 'id(dialed_code) = "";'
+
+  # Chiamata dal posto esterno: l'optoisolatore porta la linea a LOW finché qualcuno preme il pulsante.
+  - platform: gpio
+    id: call_sense
+    name: "Chiamata in corso"
+    device_class: sound
+    icon: mdi:bell-ring
+    pin:
+      number: GPIO6
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 40ms
+      - delayed_off: 1500ms
+    on_press:
+      - event.trigger:
+          id: doorbell_event
+          event_type: chiamata
+      - lambda: |-
+          id(calls) += 1;
+          id(call_count).publish_state(id(calls));
+          auto t = id(sntp_time).now();
+          if (t.is_valid()) id(last_call).publish_state(t.strftime("%d/%m/%Y %H:%M:%S"));
+      - if:
+          condition:
+            and:
+              - switch.is_off: dnd
+              - binary_sensor.is_off: handset
+          then:
+            - script.execute: ring_pattern
+      - if:
+          condition:
+            switch.is_on: auto_open
+          then:
+            - delay: 2s
+            - script.execute: open_door_remote
+
+  # Pulsante BOOT della scheda: pressione breve = test dell'apriporta (utile al collaudo)
+  - platform: gpio
+    id: boot_button
+    internal: true
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      - delayed_on: 50ms
+    on_click:
+      min_length: 50ms
+      max_length: 1s
+      then:
+        - script.execute: open_door_local
+
+sensor:
+  - platform: template
+    id: call_count
+    name: "Chiamate ricevute"
+    icon: mdi:counter
+    accuracy_decimals: 0
+    state_class: total_increasing
+    lambda: 'return id(calls);'
+    update_interval: 60s
+
+  - platform: wifi_signal
+    name: "Segnale WiFi"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: template
+    id: last_digit
+    name: "Ultimo numero composto"
+    icon: mdi:numeric
+
+  - platform: template
+    id: last_call
+    name: "Ultima chiamata"
+    icon: mdi:clock-outline
+
+  - platform: template
+    id: last_open
+    name: "Ultima apertura"
+    icon: mdi:door-open
+
+  - platform: version
+    name: "Versione ESPHome"
+    entity_category: diagnostic
+
+event:
+  - platform: template
+    id: doorbell_event
+    name: "Campanello"
+    device_class: doorbell
+    event_types:
+      - chiamata
+      - apertura
+
+button:
+  - platform: template
+    name: "Apri portone"
+    icon: mdi:door-open
+    on_press:
+      - script.execute: open_door_remote
+
+  - platform: template
+    name: "Test suoneria"
+    icon: mdi:bell
+    entity_category: diagnostic
+    on_press:
+      - script.execute: ring_pattern
+
+  - platform: restart
+    name: "Riavvia"
+    entity_category: diagnostic
+
+# -----------------------------------------------------------------------------
+#  Logica
+# -----------------------------------------------------------------------------
+script:
+  # 300 ms senza impulsi = cifra conclusa (serve se il contatto di fine rotazione non è cablato)
+  - id: digit_timeout
+    mode: restart
+    then:
+      - delay: 300ms
+      - script.execute: finalize_digit
+
+  - id: finalize_digit
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: 'return id(pulse_count) > 0;'
+          then:
+            - lambda: |-
+                int n = id(pulse_count);
+                id(pulse_count) = 0;
+                int digit = (n >= 10) ? 0 : n;          // 10 impulsi = cifra 0
+                ESP_LOGI("disco", "Composta cifra %d (%d impulsi)", digit, n);
+                id(dialed_code) += std::to_string(digit);
+                if (id(dialed_code).size() > 8)
+                  id(dialed_code) = id(dialed_code).substr(id(dialed_code).size() - 8);
+                id(last_digit).publish_state(std::to_string(digit));
+            - script.execute: clear_code_later
+            - if:
+                condition:
+                  lambda: |-
+                    // Rotella abilitata solo a cornetta alzata, se richiesto
+                    if (id(require_handset).state && !id(handset).state) return false;
+                    const std::string &code = id(secret_code).state;
+                    if (code.empty()) return true;                       // qualsiasi numero apre
+                    const std::string &d = id(dialed_code);
+                    return d.size() >= code.size() &&
+                           d.compare(d.size() - code.size(), code.size(), code) == 0;
+                then:
+                  - lambda: 'id(dialed_code) = "";'
+                  - script.execute: open_door_local
+
+  - id: clear_code_later
+    mode: restart
+    then:
+      - delay: 6s
+      - lambda: 'id(dialed_code) = "";'
+
+  # Apertura dalla rotella: la cornetta è in mano, basta K1
+  - id: open_door_local
+    mode: single
+    then:
+      - script.execute: pulse_open_relay
+      - script.wait: pulse_open_relay
+
+  # Apertura remota (Home Assistant, web, automatica): se richiesto simula prima lo sgancio
+  - id: open_door_remote
+    mode: single
+    then:
+      - lambda: 'id(remote_hook_used) = id(remote_uses_hook).state && !id(relay_hook).state;'
+      - if:
+          condition:
+            lambda: 'return id(remote_hook_used);'
+          then:
+            - switch.turn_on: relay_hook
+            - delay: ${hook_settle_ms}ms
+      - script.execute: pulse_open_relay
+      - script.wait: pulse_open_relay
+      - if:
+          condition:
+            lambda: 'return id(remote_hook_used);'
+          then:
+            - delay: 300ms
+            - switch.turn_off: relay_hook
+
+  - id: pulse_open_relay
+    mode: single
+    then:
+      - logger.log: "Apertura portone"
+      - switch.turn_on: relay_open
+      - light.turn_on: status_light
+      - delay: !lambda 'return (uint32_t) id(open_time).state;'
+      - switch.turn_off: relay_open
+      - light.turn_off: status_light
+      - event.trigger:
+          id: doorbell_event
+          event_type: apertura
+      - lambda: |-
+          auto t = id(sntp_time).now();
+          if (t.is_valid()) id(last_open).publish_state(t.strftime("%d/%m/%Y %H:%M:%S"));
+
+  # Suoneria: due squilli brevi ripetuti tre volte (come un vecchio telefono)
+  - id: ring_pattern
+    mode: restart
+    then:
+      - repeat:
+          count: 3
+          then:
+            - switch.turn_on: buzzer
+            - light.turn_on: status_light
+            - delay: 350ms
+            - switch.turn_off: buzzer
+            - delay: 150ms
+            - switch.turn_on: buzzer
+            - delay: 350ms
+            - switch.turn_off: buzzer
+            - light.turn_off: status_light
+            - delay: 1200ms

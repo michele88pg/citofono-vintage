@@ -1,0 +1,41 @@
+# Automazioni di esempio per Home Assistant
+# Incollale in Impostazioni > Automazioni > (nuova) > Modifica in YAML.
+# Sostituisci "mobile_app_tuo_telefono" con il nome del tuo telefono nell'app Home Assistant
+# e controlla i nomi delle entità (dipendono dal nome dato al dispositivo in ESPHome).
+
+# 1) Notifica sul telefono quando qualcuno citofona, con pulsante "Apri" direttamente nella notifica
+- alias: "Citofono - notifica chiamata"
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: event.citofono_vintage_campanello
+      attribute: event_type
+      to: chiamata
+  actions:
+    - action: notify.mobile_app_tuo_telefono
+      data:
+        title: "🔔 Citofono"
+        message: "Qualcuno ha suonato alle {{ now().strftime('%H:%M') }}"
+        data:
+          tag: citofono
+          actions:
+            - action: APRI_PORTONE
+              title: "Apri il portone"
+
+# 2) Il pulsante "Apri il portone" della notifica apre davvero
+- alias: "Citofono - apri da notifica"
+  mode: single
+  triggers:
+    - trigger: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: APRI_PORTONE
+  actions:
+    - action: button.press
+      target:
+        entity_id: button.citofono_vintage_apri_portone
+    - action: notify.mobile_app_tuo_telefono
+      data:
+        message: "Portone aperto"
+        data:
+          tag: citofono

@@ -1,0 +1,25 @@
+Comment,Designator,Footprint,LCSC Part#,Qty,Note
+1uF,"C1,C2,C5,C8,C9,C10,C12,C13",C_0603_1608Metric,C15849,8,
+10uF,"C3,C14,C15",C_0805_2012Metric,C15850,3,
+100nF,"C4,C6,C7,C17",C_0603_1608Metric,C14663,4,
+1uF 50V,C11,C_1206_3216Metric,,1,
+2.2uF 50V,C16,C_1206_3216Metric,,1,
+1N4148W,D1,D_SOD-123,C81598,1,
+LED blu AUDIO,D2,LED_0805_2012Metric,,1,
+a J8 scheda madre,J1,PinHeader_1x10_P2.54mm_Vertical,,1,"THT, saldatura a mano"
+a J9 (cornetta M R M/R),J2,PinHeader_1x03_P2.54mm_Vertical,,1,"THT, saldatura a mano"
+a J10 (linea 1 2),J3,PinHeader_1x02_P2.54mm_Vertical,,1,"THT, saldatura a mano"
+G5V-2-H1 DC5,K1,Relay_DPDT_Omron_G5V-2,C28066,1,"THT, saldatura a mano"
+MMBT3904,Q1,SOT-23,C20526,1,
+33,R1,R_0603_1608Metric,,1,
+4.7k,"R2,R3,R10",R_0603_1608Metric,C23162,3,
+2.2k,R4,R_0603_1608Metric,,1,
+680,R5,R_0603_1608Metric,,1,
+470,"R6,R7",R_0603_1608Metric,,2,
+1k,"R8,R12",R_0603_1608Metric,C21190,2,
+DNP 2.2k,R9,R_0603_1608Metric,,1,NON montare
+100k,R11,R_0603_1608Metric,C25803,1,
+SM-LP-5001 600:600,"T1,T2",SM-LP-5001,C7503474,2,footprint da easyeda2kicad (vedi README)
+ES8311,U1,QFN-20-1EP_3x3mm_P0.4mm_EP1.65x1.65mm,C962342,1,
+AP2112K-3.3,U2,SOT-23-5,C51118,1,
+TCA9554PWR,U3,TSSOP-16_4.4x5mm_P0.65mm,C477924,1,
