@@ -1,6 +1,6 @@
-# Pronto — a smart door intercom inside a vintage rotary phone
+﻿# Pronto â€” a smart door intercom inside a vintage rotary phone
 
-🇬🇧 English · [🇮🇹 Italiano](#-versione-italiana)
+ðŸ‡¬ðŸ‡§ English Â· [ðŸ‡®ðŸ‡¹ Italiano](#-versione-italiana)
 
 **Pronto** is an open-hardware circuit board that turns a vintage rotary phone into a **smart door intercom**. The phone looks and works exactly as before:
 
@@ -39,7 +39,7 @@ The board has **exactly the shape of the original one** and screws into its plac
 - [Safety](#safety)
 - [Contributing](#contributing)
 - [Licenses](#licenses)
-- [🇮🇹 Versione italiana](#-versione-italiana)
+- [ðŸ‡®ðŸ‡¹ Versione italiana](#-versione-italiana)
 
 ## What it does
 
@@ -121,11 +121,11 @@ Step-by-step wiring of dial, hook, handset and intercom is in [docs/installazion
 | An **S62 wall phone** | Found at flea markets and online. Dial, handset and hook switch must work |
 | The **Pronto** board | Order it pre-assembled from JLCPCB with the ready-made files in [`hardware/mainboard/production`](hardware/mainboard/production): see [Ordering the board](docs/ordinare-la-scheda.md) |
 | Hand-soldered parts | The K1 relay (through-hole, from DigiKey/Mouser) and the screw terminals. Easy soldering |
-| **Power** | URMET 4+N systems do not power the indoor unit. You need a supply on J1, **9–36 V DC or 9–24 V AC** (for example 12 V DC, 1 A), or **5 V from USB-C** |
+| **Power** | URMET 4+N systems do not power the indoor unit. You need a supply on J1, **9â€“36 V DC or 9â€“24 V AC** (for example 12 V DC, 1 A), or **5 V from USB-C** |
 | Home WiFi | Home Assistant is recommended but not required |
 | Tools | Soldering iron, multimeter, screwdriver. A computer with [ESPHome](https://esphome.io) for the first firmware upload over USB-C |
 
-Indicative parts cost is about €40 per board for 5 assembled prototypes. It drops a lot with larger quantities.
+Indicative parts cost is about â‚¬40 per board for 5 assembled prototypes. It drops a lot with larger quantities.
 
 ## Getting started
 
@@ -144,16 +144,16 @@ FAQ: [docs/faq.md](docs/faq.md)
 
 ```
 citofono-vintage/
-├── hardware/
-│   ├── mainboard/          Main board (KiCad): schematic, PCB, PDF
-│   │   └── production/     Gerber, BOM and placement files ready for JLCPCB
-│   ├── audio-board/        ES8311 audio board (remote listen/talk), schematic only
-│   └── mechanical/         S62 board outline as DXF
-├── firmware/               ESPHome firmware (+ package for the audio board)
-├── home-assistant/         Example automations (notification with "Open" button)
-├── docs/                   Documentation: how it works, installation, testing...
-├── LICENSES/               License texts
-└── CHANGELOG.md            Revision history
+â”œâ”€â”€ hardware/
+â”‚   â”œâ”€â”€ mainboard/          Main board (KiCad): schematic, PCB, PDF
+â”‚   â”‚   â””â”€â”€ production/     Gerber, BOM and placement files ready for JLCPCB
+â”‚   â”œâ”€â”€ audio-board/        ES8311 audio board (remote listen/talk), schematic only
+â”‚   â””â”€â”€ mechanical/         S62 board outline as DXF
+â”œâ”€â”€ firmware/               ESPHome firmware (+ package for the audio board)
+â”œâ”€â”€ home-assistant/         Example automations (notification with "Open" button)
+â”œâ”€â”€ docs/                   Documentation: how it works, installation, testing...
+â”œâ”€â”€ LICENSES/               License texts
+â””â”€â”€ CHANGELOG.md            Revision history
 ```
 
 ## Roadmap
@@ -171,7 +171,7 @@ citofono-vintage/
 
 ## Safety
 
-- The board works only with **extra-low voltages**: 12 V AC call signal, at most about 30 V DC on the intercom line, 9–36 V supply. **Never connect it to 230 V mains.**
+- The board works only with **extra-low voltages**: 12 V AC call signal, at most about 30 V DC on the intercom line, 9â€“36 V supply. **Never connect it to 230 V mains.**
 - The intercom system is often **shared by the whole building**. Make sure you are allowed to work on your indoor unit. Disconnect the old intercom only after identifying the terminals with a multimeter.
 - Remote opening really opens your front door. Protect Home Assistant and the board's web page with strong passwords, and never expose the board directly to the Internet.
 - The project is provided **as is**, without warranty (see [Licenses](#licenses)). Whoever builds and installs it is responsible for it.
@@ -198,34 +198,34 @@ The S62 phone is a classic of Italian industrial design, designed by Lino Saltin
 
 ---
 
-## 🇮🇹 Versione italiana
+## ðŸ‡®ðŸ‡¹ Versione italiana
 
-[🇬🇧 English](#contents) · 🇮🇹 Italiano
+[ðŸ‡¬ðŸ‡§ English](#contents) Â· ðŸ‡®ðŸ‡¹ Italiano
 
-**Pronto — il citofono smart dentro un telefono a disco**
+**Pronto â€” il citofono smart dentro un telefono a disco**
 
-**Pronto** è una scheda elettronica open hardware che trasforma un telefono a disco d'epoca in un **citofono smart**. Il telefono resta com'è, fuori e nell'uso:
+**Pronto** Ã¨ una scheda elettronica open hardware che trasforma un telefono a disco d'epoca in un **citofono smart**. Il telefono resta com'Ã¨, fuori e nell'uso:
 
 - alzi la cornetta per parlare con chi ha suonato;
 - componi un numero con il disco e il portone si apre.
 
-In più arrivano:
+In piÃ¹ arrivano:
 
 - la notifica sul cellulare quando qualcuno suona;
 - l'apertura del portone da remoto;
 - l'integrazione con Home Assistant e, tramite Home Assistant, con Google Home, Apple Home e Alexa.
 
-La scheda ha **esattamente la forma della scheda originale** e si avvita al suo posto, senza forare né modificare il guscio.
+La scheda ha **esattamente la forma della scheda originale** e si avvita al suo posto, senza forare nÃ© modificare il guscio.
 
-> **Compatibilità:** telefoni **Siemens / Italtel S62** (versione da parete) e impianti citofonici **URMET 4+N** analogici.
-> Altri telefoni e impianti: vedi [Compatibilità](docs/compatibilita.md).
+> **CompatibilitÃ :** telefoni **Siemens / Italtel S62** (versione da parete) e impianti citofonici **URMET 4+N** analogici.
+> Altri telefoni e impianti: vedi [CompatibilitÃ ](docs/compatibilita.md).
 
 ![Scheda Pronto rev 0.5: lato componenti e lato saldature](docs/img/board_top_bottom.png)
 
 > [!WARNING]
-> **Progetto in fase di prototipo.** La scheda rev 0.5 è stata ordinata (5 esemplari assemblati) ma **non è ancora stata collaudata**.
-> Il firmware è validato, ma non ancora provato sull'hardware vero.
-> Se vuoi costruirla adesso sei il benvenuto, ma aspettati di dover correggere qualcosa. Lo stato aggiornato è nel [CHANGELOG](CHANGELOG.md).
+> **Progetto in fase di prototipo.** La scheda rev 0.5 Ã¨ stata ordinata (5 esemplari assemblati) ma **non Ã¨ ancora stata collaudata**.
+> Il firmware Ã¨ validato, ma non ancora provato sull'hardware vero.
+> Se vuoi costruirla adesso sei il benvenuto, ma aspettati di dover correggere qualcosa. Lo stato aggiornato Ã¨ nel [CHANGELOG](CHANGELOG.md).
 
 ### Indice
 
@@ -246,7 +246,7 @@ La scheda ha **esattamente la forma della scheda originale** e si avvita al suo 
 |---|---|
 | **Rispondere** | Come sempre: alzi la cornetta e parli. L'audio passa in analogico, la scheda non lo tocca |
 | **Aprire con il disco** | Componi un numero qualsiasi e il portone si apre, come facevano molti citofoni-telefono d'epoca. Opzionale: un **codice segreto** da comporre |
-| **Suoneria** | Quando suonano al portone, il buzzer della scheda squilla con un doppio squillo da telefono. La suoneria originale a campanelli si può collegare in via sperimentale |
+| **Suoneria** | Quando suonano al portone, il buzzer della scheda squilla con un doppio squillo da telefono. La suoneria originale a campanelli si puÃ² collegare in via sperimentale |
 | **Notifica sul cellulare** | Arriva una notifica con il pulsante **"Apri il portone"** dentro |
 | **Apertura remota** | Da Home Assistant, dalla notifica, dall'assistente vocale o dalla pagina web della scheda |
 | **Non disturbare** | Silenzia lo squillo; la notifica arriva comunque |
@@ -286,32 +286,32 @@ flowchart LR
     ESP <-->|WiFi| HA
 ```
 
-**Isolamento dall'impianto.** La scheda non ha nessun collegamento elettrico diretto con l'impianto condominiale. Sente la chiamata con un optoisolatore e apre il portone con relè allo stato solido PhotoMOS, che isolano otticamente. La massa dell'elettronica resta così separata dalla linea del citofono.
+**Isolamento dall'impianto.** La scheda non ha nessun collegamento elettrico diretto con l'impianto condominiale. Sente la chiamata con un optoisolatore e apre il portone con relÃ¨ allo stato solido PhotoMOS, che isolano otticamente. La massa dell'elettronica resta cosÃ¬ separata dalla linea del citofono.
 
-Il funzionamento completo è in **[docs/come-funziona.md](docs/come-funziona.md)**: ogni blocco del circuito, le sequenze di apertura, i tempi del disco e le sicurezze del firmware.
+Il funzionamento completo Ã¨ in **[docs/come-funziona.md](docs/come-funziona.md)**: ogni blocco del circuito, le sequenze di apertura, i tempi del disco e le sicurezze del firmware.
 
 ### Mappa dei morsetti
 
 ![Mappa dei morsetti della scheda Pronto rev 0.5](docs/img/mappa-morsetti.png)
 
-Il collegamento passo passo di disco, gancio, cornetta e citofono è in [docs/installazione.md](docs/installazione.md).
+Il collegamento passo passo di disco, gancio, cornetta e citofono Ã¨ in [docs/installazione.md](docs/installazione.md).
 
 ### Cosa serve
 
 | Cosa | Note |
 |---|---|
 | Un telefono **S62 da parete** | Si trova nei mercatini e online. Deve avere disco, cornetta e gancio funzionanti |
-| La scheda **Pronto** | Si ordina già assemblata da JLCPCB con i file pronti in [`hardware/mainboard/production`](hardware/mainboard/production): vedi [Ordinare la scheda](docs/ordinare-la-scheda.md) |
-| Componenti da saldare a mano | Il relè K1 (a foro passante, da DigiKey/Mouser) e le morsettiere a vite. Sono saldature facili |
-| **Alimentazione** | L'impianto URMET 4+N non alimenta il posto interno. Serve un alimentatore su J1, **9–36 V DC o 9–24 V AC** (per esempio 12 V DC da 1 A), oppure **5 V da USB-C** |
-| WiFi di casa | Home Assistant è consigliato ma non obbligatorio |
+| La scheda **Pronto** | Si ordina giÃ  assemblata da JLCPCB con i file pronti in [`hardware/mainboard/production`](hardware/mainboard/production): vedi [Ordinare la scheda](docs/ordinare-la-scheda.md) |
+| Componenti da saldare a mano | Il relÃ¨ K1 (a foro passante, da DigiKey/Mouser) e le morsettiere a vite. Sono saldature facili |
+| **Alimentazione** | L'impianto URMET 4+N non alimenta il posto interno. Serve un alimentatore su J1, **9â€“36 V DC o 9â€“24 V AC** (per esempio 12 V DC da 1 A), oppure **5 V da USB-C** |
+| WiFi di casa | Home Assistant Ã¨ consigliato ma non obbligatorio |
 | Attrezzatura | Saldatore, tester, cacciavite. Un computer con [ESPHome](https://esphome.io) per il primo caricamento del firmware via USB-C |
 
-Il costo indicativo dei componenti è di circa 40 € a scheda su 5 prototipi assemblati. Scende molto con quantità maggiori.
+Il costo indicativo dei componenti Ã¨ di circa 40 â‚¬ a scheda su 5 prototipi assemblati. Scende molto con quantitÃ  maggiori.
 
 ### Da dove iniziare
 
-1. **Verifica la compatibilità** del tuo impianto e del tuo telefono: [docs/compatibilita.md](docs/compatibilita.md)
+1. **Verifica la compatibilitÃ ** del tuo impianto e del tuo telefono: [docs/compatibilita.md](docs/compatibilita.md)
 2. **Ordina e monta la scheda:** [docs/ordinare-la-scheda.md](docs/ordinare-la-scheda.md)
 3. **Carica il firmware:** [firmware/README.md](firmware/README.md)
 4. **Installa la scheda nel telefono e collegala al citofono:** [docs/installazione.md](docs/installazione.md)
@@ -324,16 +324,16 @@ Domande frequenti: [docs/faq.md](docs/faq.md)
 
 ```
 citofono-vintage/
-├── hardware/
-│   ├── mainboard/          Scheda principale (KiCad): schema, PCB, PDF
-│   │   └── production/     Gerber, BOM e posizionamento pronti per JLCPCB
-│   ├── audio-board/        Scheda audio ES8311 (ascolto e risposta da remoto), solo schema
-│   └── mechanical/         Contorno della scheda S62 in DXF
-├── firmware/               Firmware ESPHome (+ pacchetto per la scheda audio)
-├── home-assistant/         Automazioni di esempio (notifica con pulsante "Apri")
-├── docs/                   Documentazione: funzionamento, installazione, collaudo...
-├── LICENSES/               Testi delle licenze
-└── CHANGELOG.md            Storia delle revisioni
+â”œâ”€â”€ hardware/
+â”‚   â”œâ”€â”€ mainboard/          Scheda principale (KiCad): schema, PCB, PDF
+â”‚   â”‚   â””â”€â”€ production/     Gerber, BOM e posizionamento pronti per JLCPCB
+â”‚   â”œâ”€â”€ audio-board/        Scheda audio ES8311 (ascolto e risposta da remoto), solo schema
+â”‚   â””â”€â”€ mechanical/         Contorno della scheda S62 in DXF
+â”œâ”€â”€ firmware/               Firmware ESPHome (+ pacchetto per la scheda audio)
+â”œâ”€â”€ home-assistant/         Automazioni di esempio (notifica con pulsante "Apri")
+â”œâ”€â”€ docs/                   Documentazione: funzionamento, installazione, collaudo...
+â”œâ”€â”€ LICENSES/               Testi delle licenze
+â””â”€â”€ CHANGELOG.md            Storia delle revisioni
 ```
 
 ### Prossimi passi
@@ -345,21 +345,21 @@ citofono-vintage/
 - [ ] Collaudo dei prototipi rev 0.5 su impianto URMET reale
 - [ ] PCB della scheda audio e integrazione della chiamata vocale sul cellulare
 - [ ] Guida fotografica al montaggio e sito del progetto
-- [ ] Versione più economica e semplificata della scheda (ESP32 direttamente sulla scheda, meno componenti)
-- [ ] Compatibilità con altri impianti 4+N e con altri telefoni a disco
+- [ ] Versione piÃ¹ economica e semplificata della scheda (ESP32 direttamente sulla scheda, meno componenti)
+- [ ] CompatibilitÃ  con altri impianti 4+N e con altri telefoni a disco
 - [ ] Traduzione in inglese della documentazione
 
 ### Sicurezza
 
-- La scheda lavora solo con **bassissime tensioni**: 12 V AC di chiamata, al massimo circa 30 V DC sulla linea citofonica, 9–36 V di alimentazione. **Non va mai collegata alla rete a 230 V.**
-- L'impianto citofonico è spesso **condominiale**. Prima di intervenire sul tuo posto interno, verifica di poterlo fare. Scollega il vecchio citofono solo dopo aver identificato i morsetti con il tester.
+- La scheda lavora solo con **bassissime tensioni**: 12 V AC di chiamata, al massimo circa 30 V DC sulla linea citofonica, 9â€“36 V di alimentazione. **Non va mai collegata alla rete a 230 V.**
+- L'impianto citofonico Ã¨ spesso **condominiale**. Prima di intervenire sul tuo posto interno, verifica di poterlo fare. Scollega il vecchio citofono solo dopo aver identificato i morsetti con il tester.
 - L'apertura remota apre davvero il portone di casa. Proteggi Home Assistant e la pagina web della scheda con password robuste, e non esporre la scheda direttamente su Internet.
-- Il progetto è fornito **così com'è**, senza garanzie (vedi [Licenze](#licenze)). Chi lo costruisce e lo installa ne è responsabile.
+- Il progetto Ã¨ fornito **cosÃ¬ com'Ã¨**, senza garanzie (vedi [Licenze](#licenze)). Chi lo costruisce e lo installa ne Ã¨ responsabile.
 
 ### Contribuire
 
-Il contributo più prezioso adesso è sapere **su quali impianti e telefoni funziona**.
-Se lo provi, apri una [segnalazione di compatibilità](../../issues/new?template=compatibilita.md), anche se non funziona. Servono marca e modello dell'impianto e del telefono, e le misure fatte.
+Il contributo piÃ¹ prezioso adesso Ã¨ sapere **su quali impianti e telefoni funziona**.
+Se lo provi, apri una [segnalazione di compatibilitÃ ](../../issues/new?template=compatibilita.md), anche se non funziona. Servono marca e modello dell'impianto e del telefono, e le misure fatte.
 
 Correzioni, foto del montaggio e traduzioni sono benvenute: vedi [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -373,5 +373,5 @@ Correzioni, foto del montaggio e traduzioni sono benvenute: vedi [CONTRIBUTING.m
 
 I dettagli sono in [LICENSE.md](LICENSE.md).
 
-**Marchi.** Siemens, Italtel e URMET sono marchi dei rispettivi proprietari. Sono citati solo per indicare la compatibilità. Questo è un progetto indipendente, non affiliato né approvato da loro.
-Il telefono S62 è un classico del design industriale italiano, disegnato da Lino Saltini negli anni '60. Questo progetto non ne riproduce il guscio: ne sostituisce solo l'elettronica interna.
+**Marchi.** Siemens, Italtel e URMET sono marchi dei rispettivi proprietari. Sono citati solo per indicare la compatibilitÃ . Questo Ã¨ un progetto indipendente, non affiliato nÃ© approvato da loro.
+Il telefono S62 Ã¨ un classico del design industriale italiano, disegnato da Lino Saltini negli anni '60. Questo progetto non ne riproduce il guscio: ne sostituisce solo l'elettronica interna.

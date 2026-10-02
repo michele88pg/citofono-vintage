@@ -1,4 +1,4 @@
-# Hardware
+﻿# Hardware
 
 | Cartella | Contenuto | Stato |
 |---|---|---|
@@ -8,7 +8,7 @@
 
 ## Licenza
 
-Tutto il contenuto di questa cartella è rilasciato con la licenza **CERN Open Hardware Licence Version 2 – Strongly Reciprocal** (CERN-OHL-S-2.0). Il testo completo è in [`LICENSES/CERN-OHL-S-2.0.txt`](../LICENSES/CERN-OHL-S-2.0.txt).
+Tutto il contenuto di questa cartella Ã¨ rilasciato con la licenza **CERN Open Hardware Licence Version 2 â€“ Strongly Reciprocal** (CERN-OHL-S-2.0). Il testo completo Ã¨ in [`LICENSES/CERN-OHL-S-2.0.txt`](../LICENSES/CERN-OHL-S-2.0.txt).
 
 Source location: https://github.com/michele88pg/citofono-vintage
 
@@ -16,4 +16,4 @@ Chi produce o distribuisce schede basate su questo progetto, anche modificate, d
 - rendere disponibili i sorgenti con la stessa licenza;
 - mantenere questa indicazione della sorgente.
 
-Copyright © 2026 Michele Matteucci
+Copyright Â© 2026 Michele Matteucci
