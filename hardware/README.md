@@ -10,7 +10,7 @@
 
 Tutto il contenuto di questa cartella è rilasciato con la licenza **CERN Open Hardware Licence Version 2 – Strongly Reciprocal** (CERN-OHL-S-2.0). Il testo completo è in [`LICENSES/CERN-OHL-S-2.0.txt`](../LICENSES/CERN-OHL-S-2.0.txt).
 
-Source location: https://github.com/TUO-UTENTE/pronto-citofono
+Source location: https://github.com/michele88pg/citofono-vintage
 
 Chi produce o distribuisce schede basate su questo progetto, anche modificate, deve:
 - rendere disponibili i sorgenti con la stessa licenza;
